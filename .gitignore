@@ -1,0 +1,16 @@
+.cache/
+alias/
+# Ignorar arquivos de ambiente com senhas e chaves secretas
+.env
+.env.local
+
+# Ignorar logs do sistema ou de erros
+*.log
+npm-debug.log*
+
+# Ignorar pastas geradas por compilação (build)
+dist/
+build/
+
+# Ignorar arquivos do sistema operacional (ex: macOS)
+.DS_Store
