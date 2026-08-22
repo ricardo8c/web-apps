@@ -1,0 +1,34 @@
+http:
+  routers:
+    #serviço + novo cert
+    portainer-dynu:
+      rule: "Host(`p.dominio.com`)"
+      service: portainer-dynu
+      tls:
+        certResolver: dns2
+        domains:
+          - main: "dominio.com"
+            sans:
+              - "*.dominio.com"
+
+    #serviço para dominio que já tem o cert
+    zb-rtr:
+      rule: "Host(`bkp.dominio.fun`)" #      rule: "Host(`wg1.{{env "DOMAINNAME_PROD"}}`)" 
+      entryPoints:
+        - websecure
+      #middlewares:
+      #  - traefik-forward-auth@swarm
+      service: zb-svc
+      tls: {}
+
+  services:
+    portainer-dynu:
+      loadBalancer:
+        servers:
+          - url: "http://portainer:9000"
+
+    zb-svc:
+      loadBalancer:
+        servers:
+          - url: "http://zerobyte:4096" # http://IP-ADDRESS:PORT
+
