@@ -1,0 +1,30 @@
+services:
+  9router:
+    image: ghcr.io/decolua/9router:latest #0.4.71
+    hostname: 9router
+    #ports:
+    #  - "20128:20128"
+    volumes:
+      - 9router_data:/app/data
+    networks:
+      - proxy2
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.9router.rule=Host(`9r.$DOMAINNAME3`)
+        - traefik.http.services.9router.loadbalancer.server.port=20128
+        #- traefik.http.routers.9router.middlewares=tinyauth
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2
+
+volumes:
+  9router_data:
+    name: 9router_data
