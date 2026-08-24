@@ -5,6 +5,7 @@ services:
     hostname: uptime
     networks:
       - proxy2
+      - proxy
     volumes:
       - uptime-kuma:/app/data
     deploy:
@@ -23,6 +24,10 @@ networks:
     external: true
     attachable: true
     name: proxy2
+  proxy:
+    external: true
+    attachable: true
+    name: proxy
 
 volumes:
   uptime-kuma:
