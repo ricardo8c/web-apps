@@ -1,0 +1,31 @@
+services:
+  filebrowser:
+    image: gtstef/filebrowser:stable
+    hostname: filebrowser
+    user: "1001:1001" # Ajuste conforme seu UID/GID
+    environment:
+      - FILEBROWSER_CONFIG=/home/filebrowser/config.yaml
+    volumes:
+      #- nfs_fb:/nfs
+      - ${APPS_DIR:-/home/ubuntu/prod/volumes}/filebrowser/config.yaml:/home/filebrowser/config.yaml:ro
+      - ${APPS_DIR:-/home/ubuntu/prod/volumes}/filebrowser/data:/home/filebrowser/data
+      #- filebrowser_data:/home/filebrowser/data
+      - ${USER_DIR:-/home/ubuntu}/users:/srv
+      - ${USER_DIR:-/home/ubuntu}:/local
+    #ports:
+    #  - 8080:80
+    networks:
+      - proxy2
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=false
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2
