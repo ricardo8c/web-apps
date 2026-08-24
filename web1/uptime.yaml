@@ -1,0 +1,30 @@
+services:
+  uptime:
+    image: ghcr.io/louislam/uptime-kuma:2.5.3 #louislam/uptime-kuma:1.23.17
+    #docker pull ghcr.io/louislam/uptime-kuma:2.5.3
+    hostname: uptime
+    networks:
+      - proxy2
+    volumes:
+      - uptime-kuma:/app/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.uptime.rule=Host(`uptime.$DOMAINNAME2`)
+        - traefik.http.services.uptime.loadbalancer.server.port=3001
+        - traefik.http.routers.uptime.middlewares=tinyauth
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2
+
+volumes:
+  uptime-kuma:
+    #external: true
+    name: uptime-kuma
