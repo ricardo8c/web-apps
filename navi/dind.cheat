@@ -1,0 +1,43 @@
+% dind, docker
+
+# Listar containers em execução
+docker ps
+
+# Listar todos os containers (inclusive parados)
+docker ps -a --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
+
+# Entrar no shell de um container
+docker exec -it {{container_name}} /bin/bash
+
+$ container_name: docker ps --format '{{.Names}}'
+
+# Ver logs de um container
+docker logs -f --tail {{n}} {{container_name}}
+
+$ container_name: docker ps --format '{{.Names}}'
+$ n: 100
+
+# Reiniciar um container
+docker restart {{container_name}}
+
+$ container_name: docker ps -a --format '{{.Names}}'
+
+# Remover containers parados
+docker container prune -f
+
+# Inspecionar rede de um container
+docker inspect {{container_name}} | grep -i ipaddress
+
+$ container_name: docker ps --format '{{.Names}}'
+
+# dind_init com portmap 80,443,9000,3000
+docker run --privileged -d -p 80:80 -p 443:443 -p 9000:9000 -p 3000:3000 \
+  -v $(pwd):/projeto/app \
+  -v $HOME/projetos/dind_share:/projeto/share \
+  -v dind_$(basename "$(pwd)")_root:/root \
+  -v dind_$(basename "$(pwd)")_volumes:/projeto/volumes \
+  -v dind_$(basename "$(pwd)"):/var/lib/docker \
+  --restart unless-stopped --name $(basename "$(pwd)") docker
+printf "persistir dados em: /projeto/volumes (volume no host: dind_$(basename "$(pwd)")_volumes)\ncompartilhar dados com o host em: /projeto/share (pasta no host ~\projetos\dind_share)\n"
+docker exec -it -w /projeto/app $(basename "$(pwd)") /bin/sh
+
