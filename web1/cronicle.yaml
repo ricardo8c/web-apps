@@ -1,0 +1,32 @@
+services:
+  cronicle:
+    command: manager
+    image: cronicle/edge:v1.14.1
+    hostname: cronicle
+    environment:
+      - CRONICLE_secret_key=${CRONICLE_secret_key}
+    volumes:
+      - cronicle:/opt/cronicle/data
+    networks:
+      - proxy2
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.cronicle.rule=Host(`cron.$DOMAINNAME2`)
+        - traefik.http.services.cronicle.loadbalancer.server.port=3012
+        - traefik.http.routers.cronicle.middlewares=tinyauth
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2
+
+volumes:
+  cronicle:
+    external: true
+    name: cronicle

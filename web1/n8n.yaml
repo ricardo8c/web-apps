@@ -1,0 +1,121 @@
+#ultima, 2.18.7, remover os segredos do commit
+x-n8n-shared-env: &n8n-shared-env
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=n8n_queue
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_HOST=n.${DOMAINNAME2}
+      - N8N_EDITOR_BASE_URL=https://n.${DOMAINNAME3}/
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - WEBHOOK_URL=https://api.${DOMAINNAME3}/
+      - EXECUTIONS_MODE=queue
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - QUEUE_BULL_REDIS_DB=2
+      - NODE_FUNCTION_ALLOW_EXTERNAL=moment,lodash,moment-with-locales
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=336
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - TZ=America/Sao_Paulo
+      - LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
+      - LANGCHAIN_TRACING_V2=true
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      # 2.x CHANGES:
+      - N8N_RESTRICT_FILE_ACCESS_TO=/ambiente
+      - N8N_SKIP_AUTH_ON_OAUTH_CALLBACK=false
+      - N8N_RUNNERS_ENABLED=true
+      - NODES_EXCLUDE="[]"
+
+services:
+  n8n_editor:
+    image: n8nio/n8n:latest #2.18.7
+    hostname: n8n_editor
+    command: start
+    volumes:
+      - ${APPS_DIR}/n8n_files:/tmp
+      - ${APPS_DIR}/n8n/ambiente:/ambiente
+    networks:
+      - proxy
+    environment: *n8n-shared-env
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.n8n_editor.rule=Host(`n.$DOMAINNAME3`)
+        - traefik.http.services.n8n_editor.loadbalancer.server.port=5678
+        - traefik.http.routers.n8n_editor.tls.certresolver=dns2
+
+  n8n_webhook:
+    image: n8nio/n8n:latest
+    hostname: n8n_webhook
+    command: webhook
+    volumes:
+      - ${APPS_DIR}/n8n_files:/tmp
+      - ${APPS_DIR}/n8n/ambiente:/ambiente
+    networks:
+      - proxy
+    environment: *n8n-shared-env
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.n8n_webhook.rule=Host(`api.$DOMAINNAME3`) && !PathPrefix(`/mcp`)
+        - traefik.http.routers.n8n_webhook.priority=5       # prioridade menor
+        - traefik.http.services.n8n_webhook.loadbalancer.server.port=5678
+        - traefik.http.routers.n8n_webhook.tls.certresolver=dns2
+
+  n8n_webhook_mcp:
+    image: n8nio/n8n:latest
+    hostname: n8n_webhook_mcp
+    command: webhook
+    volumes:
+      - ${APPS_DIR}/n8n_files:/tmp
+      - ${APPS_DIR}/n8n/ambiente:/ambiente
+    networks:
+      - proxy
+    environment: *n8n-shared-env
+    deploy:
+      mode: replicated
+      replicas: 1                          # SEMPRE 1 — SSE exige instância única
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        # Rota dedicada para /mcp* neste serviço
+        - traefik.http.routers.n8n_mcp.rule=Host(`api.$DOMAINNAME3`) && PathPrefix(`/mcp`)
+        - traefik.http.routers.n8n_mcp.priority=10          # prioridade maior que o webhook normal
+        - traefik.http.services.n8n_mcp.loadbalancer.server.port=5678
+        - traefik.http.routers.n8n_mcp.tls.certresolver=dns2
+
+  n8n_worker:
+    image: n8nio/n8n:latest
+    hostname: n8n_worker
+    command: worker --concurrency=10
+    volumes:
+      - ${APPS_DIR}/n8n_files:/tmp
+      - ${APPS_DIR}/n8n/ambiente:/ambiente
+    networks:
+      - proxy
+    environment: *n8n-shared-env
+    deploy:
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints: [node.platform.os == linux]
+
+networks:
+  proxy:
+    external: true
+    attachable: true
+    name: proxy

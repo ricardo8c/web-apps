@@ -1,0 +1,47 @@
+services:
+  beszel:
+    image: henrygd/beszel
+    hostname: beszel
+    volumes:
+      - beszel_data:/beszel_data
+    networks:
+      - proxy2
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.beszel.rule=Host(`b.$DOMAINNAME2`)
+        - traefik.http.services.beszel.loadbalancer.server.port=8090
+        #- traefik.http.routers.beszel.middlewares=traefik-forward-auth
+
+  beszel-agent:
+    image: henrygd/beszel-agent
+    hostname: beszel-agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # monitor other disks / partitions by mounting a folder in /extra-filesystems
+      # - /mnt/disk/.beszel:/extra-filesystems/sda1:ro
+    environment:
+      LISTEN: 45876
+      KEY: ${BESZEL_AGENT_KEY}
+    networks:
+      - proxy2
+    ports:
+      - 45876:45876
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2
+
+volumes:
+  beszel_data:
+    name: beszel_data

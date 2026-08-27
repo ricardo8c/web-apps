@@ -1,0 +1,59 @@
+services:
+  garage:
+    image: dxflrs/garage:v2.3.0
+    hostname: garage
+    #ports:
+    #  - "3900:3900" # API S3
+    #  - "3901:3901" # RPC (Comunicação entre nós)
+    #  - "3903:3903" # API de Admin
+    volumes:
+      # Mapeia seu arquivo de configuração local para dentro do contêiner
+      - ${APPS_DIR}/garage/garage.toml:/etc/garage.toml:ro
+      # Garante a persistência dos arquivos armazenados
+      - ${STORAGE_DIR}/garage_meta:/var/lib/garage/meta
+      - ${STORAGE_DIR}/garage_data:/var/lib/garage/data
+    networks:
+      - proxy2
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.garage_public.rule=Host(`storage.$DOMAINNAME3`)
+        - traefik.http.services.garage_public.loadbalancer.server.port=3900
+        - traefik.http.routers.garage_public.service=garage_public
+        - traefik.http.routers.garage_adm.rule=Host(`garageadm.$DOMAINNAME3`)
+        - traefik.http.services.garage_adm.loadbalancer.server.port=3903
+        - traefik.http.routers.garage_adm.service=garage_adm
+
+  webui:
+    image: khairul169/garage-webui:latest
+    hostname: garage-webui
+    volumes:
+      - ${APPS_DIR}/garage/garage.toml:/etc/garage.toml:ro
+    #ports:
+    #  - 3909:3909
+    environment:
+      API_BASE_URL: "http://garage:3903"
+      S3_ENDPOINT_URL: "http://garage:3900"
+    networks:
+      - proxy2
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.garage_webui.rule=Host(`garage.$DOMAINNAME2`)
+        - traefik.http.services.garage_webui.loadbalancer.server.port=3909
+        - traefik.http.routers.garage_webui.service=garage_webui
+        - traefik.http.routers.garage_webui.middlewares=tinyauth
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2

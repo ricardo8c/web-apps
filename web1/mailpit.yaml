@@ -1,0 +1,39 @@
+services:
+  maildev:
+    image: axllent/mailpit
+    hostname: maildev
+    ports:
+      - 1025:1025
+      - 1110:1110 #pop3
+    volumes:
+      - mailpit:/data
+    networks:
+      - proxy
+    environment:
+      MP_MAX_MESSAGES: 0 #0 mantem todas
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      MP_WEBHOOK_URL: https://api.$DOMAINNAME3/webhook/mailpit
+      MP_WEBHOOK_LIMIT: 20
+      TZ: America/Sao_Paulo
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.maildev.rule=Host(`maildev.$DOMAINNAME2`)
+        - traefik.http.services.maildev.loadbalancer.server.port=8025
+        - traefik.http.routers.maildev.middlewares=tinyauth
+
+networks:
+  proxy:
+    external: true
+    attachable: true
+    name: proxy
+
+volumes:
+  mailpit:
+    name: mailpit
