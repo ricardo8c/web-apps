@@ -5,6 +5,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl gnupg iptables supervisor kmod \
     && rm -rf /var/lib/apt/lists/*
 
+# Instala fzf
+RUN apt-get update && apt-get install -y fzf
+
+# Instala navi
+RUN bash -c 'bash <(curl -sL https://raw.githubusercontent.com/denisidoro/navi/master/scripts/install)'
+
+# Move o binario do navi
+RUN mv /root/.cargo/bin/navi /usr/local/bin/
+
+# Instala o infisical
+RUN curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | bash \
+    && apt-get update && apt-get install -y infisical
+
 # Instala Docker CE (engine + CLI + containerd)
 RUN install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
