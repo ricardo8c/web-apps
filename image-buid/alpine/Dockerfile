@@ -1,7 +1,7 @@
 FROM docker:latest
 
-# instalar curl, navi e skim
-RUN apk add navi skim curl bash
+# instalar tools
+RUN apk add navi skim curl bash nano
 
 # instalar infisical
 RUN apk add --no-cache bash sudo wget \

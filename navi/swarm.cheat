@@ -41,3 +41,20 @@ docker run --privileged -d -p 80:80 -p 443:443 -p 9000:9000 -p 3000:3000 \
 printf "persistir dados em: /projeto/volumes (volume no host: dind_$(basename "$(pwd)")_volumes)\ncompartilhar dados com o host em: /projeto/share (pasta no host ~\projetos\dind_share)\n"
 docker exec -it -w /projeto/app $(basename "$(pwd)") /bin/sh
 
+
+% docker, stack
+
+# mostrar vars da Stack
+export $(grep -v '^#' ../config.env | xargs)
+infisical run --env=<oambiente> --path=/web1/deploy/<stack> -- printenv
+
+# Remover Stack
+docker stack rm <stack_name>
+
+# Deploy Stack
+export $(grep -v '^#' ../config.env | xargs)
+infisical run --env=<oambiente> --path=/web1/deploy/<stack> --path=/web1 -- docker stack deploy --prune --resolve-image always -c web1/<stack>.yaml <stack>
+
+$ oambiente: [ -n "$AMBIENTE" ] && echo "$AMBIENTE" || echo "dev staging prod" | tr ' ' '\n'
+$ stack: ls web1/*.yaml 2>/dev/null | xargs -n 1 basename | sed 's/\.yaml$//'
+$ stack_name: docker stack ls --format '{{.Name}}'
