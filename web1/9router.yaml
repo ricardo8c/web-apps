@@ -1,6 +1,6 @@
 services:
   9router:
-    image: ghcr.io/decolua/9router:latest #0.4.71
+    image: ghcr.io/decolua/9router:${VERSAO_IMAGEM}
     hostname: 9router
     #ports:
     #  - "20128:20128"

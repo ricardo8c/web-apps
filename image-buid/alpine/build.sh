@@ -1,5 +1,5 @@
 # build
-docker build -t ricardohcaldeira/dind .
+docker build -t ricardohcaldeira/alpine-dind .
 
 # upload to docker hub
-docker push ricardohcaldeira/dind:latest
+docker push ricardohcaldeira/alpine-dind:latest

@@ -41,6 +41,15 @@ docker run --privileged -d -p 80:80 -p 443:443 -p 9000:9000 -p 3000:3000 \
 printf "persistir dados em: /projeto/volumes (volume no host: dind_$(basename "$(pwd)")_volumes)\ncompartilhar dados com o host em: /projeto/share (pasta no host ~\projetos\dind_share)\n"
 docker exec -it -w /projeto/app $(basename "$(pwd)") /bin/sh
 
+% docker, netshoot
+# netshoot in Host network
+docker run -it --rm --net host nicolaka/netshoot
+
+# netshoot in a container network
+docker run -it --rm --net "container:<container_name>" nicolaka/netshoot
+
+$ container_name: docker ps --format "{{.Names}}"
+
 
 % docker, stack
 
@@ -58,3 +67,18 @@ infisical run --env=<oambiente> --path=/web1/deploy/<stack> --path=/web1 -- dock
 $ oambiente: [ -n "$AMBIENTE" ] && echo "$AMBIENTE" || echo "dev staging prod" | tr ' ' '\n'
 $ stack: ls web1/*.yaml 2>/dev/null | xargs -n 1 basename | sed 's/\.yaml$//'
 $ stack_name: docker stack ls --format '{{.Name}}'
+
+
+% docker, volumes
+
+# Backup a docker volume
+docker run --rm --log-driver none -v "<volume_name>":/volume loomchild/volume-backup backup > "./<volume_name>.tar.bz2"
+echo "Backup concluído!"
+echo "Arquivo criado: <volume_name>"
+
+$ volume_name: docker volume ls --format "{{.Name}}"
+
+% docker, postgres
+# criar novo banco de dados no postgres(local)
+docker exec -it $(docker ps -q -f "name=postgres_postgres") createdb -U postgres <novo_banco>
+printf "O banco de dados '<novo_banco>' foi criado.\n"

@@ -1,5 +1,5 @@
 services:
-  maildev:
+  mailpit:
     image: axllent/mailpit
     hostname: maildev
     ports:
