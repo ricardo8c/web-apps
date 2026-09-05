@@ -1,0 +1,16 @@
+% mycheats
+
+# download a navi cheat from rustfs
+rclone copyto rustfs:dev/navi-cheats/<cheat_file> ~/.local/share/navi/cheats/<cheat_file>
+
+# upload navi cheats to rustfs
+rclone copy ~/.local/share/navi/cheats rustfs:dev/navi-cheats
+
+# delete a remote(rustfs) navi cheat file
+rclone delete rustfs:dev/navi-cheats/<cheat_file>
+
+# delete a local navi cheat file
+rclone delete ~/.local/share/navi/cheats/<cheat_file_local>
+
+$ cheat_file: rclone ls rustfs:dev/navi-cheats | awk '{print $2}'
+$ cheat_file_local: rclone ls ~/.local/share/navi/cheats | awk '{print $2}'

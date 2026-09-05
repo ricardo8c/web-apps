@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl gnupg iptables supervisor kmod iproute2 nano sudo \
+    ca-certificates curl gnupg iptables supervisor kmod iproute2 nano sudo rclone \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala fzf

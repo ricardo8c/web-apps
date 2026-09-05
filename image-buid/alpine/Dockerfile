@@ -1,7 +1,7 @@
 FROM docker:latest
 
 # instalar tools
-RUN apk add navi skim curl bash nano
+RUN apk add navi skim curl bash nano rclone
 
 # instalar infisical
 RUN apk add --no-cache bash sudo wget \
