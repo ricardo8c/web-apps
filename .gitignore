@@ -1,7 +1,7 @@
 .cache/
 alias/
 # Ignorar arquivos de ambiente com senhas e chaves secretas
-.env
+*.env
 .env.local
 
 # Ignorar logs do sistema ou de erros
