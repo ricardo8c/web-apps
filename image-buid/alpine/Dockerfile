@@ -4,7 +4,11 @@ FROM docker:latest
 RUN apk add navi skim curl bash nano rclone
 
 # instalar infisical
-RUN apk add --no-cache bash sudo wget \
-    && wget -qO- 'https://artifacts-cli.infisical.com/setup.apk.sh' | sudo sh \
-    && apk update \
-    && sudo apk add infisical
+#RUN apk add --no-cache bash sudo wget \
+#    && wget -qO- 'https://artifacts-cli.infisical.com/setup.apk.sh' | sudo sh \
+#    && apk update \
+#    && sudo apk add infisical
+
+# instala do dotenvx
+RUN curl -sfS https://dotenvx.sh | sh
+

@@ -2,11 +2,11 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl gnupg iptables supervisor kmod iproute2 nano sudo rclone \
+    ca-certificates curl gnupg iptables supervisor kmod iproute2 nano sudo rclone fzf \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala fzf
-RUN apt-get update && apt-get install -y fzf
+#RUN apt-get update && apt-get install -y fzf
 
 # Instala navi
 RUN bash -c 'bash <(curl -sL https://raw.githubusercontent.com/denisidoro/navi/master/scripts/install)'
@@ -15,8 +15,11 @@ RUN bash -c 'bash <(curl -sL https://raw.githubusercontent.com/denisidoro/navi/m
 RUN mv /root/.cargo/bin/navi /usr/local/bin/
 
 # Instala o infisical
-RUN curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | bash \
-    && apt-get update && apt-get install -y infisical
+#RUN curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | bash \
+#    && apt-get update && apt-get install -y infisical
+
+# instala do dotenvx
+RUN curl -sfS https://dotenvx.sh | sh
 
 # Instala Docker CE (engine + CLI + containerd)
 RUN install -m 0755 -d /etc/apt/keyrings \
