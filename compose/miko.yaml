@@ -1,0 +1,24 @@
+services:
+  mikopbx:
+    container_name: "mikopbx"
+    image: "mikopbx/mikopbx"
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+    entrypoint: "/sbin/docker-entrypoint"
+    hostname:  "mikopbx"
+    volumes:
+      - mikopbx-cf:/cf
+      - mikopbx-storage:/storage
+    tty: true
+    environment:
+      - PBX_NAME=${MIKO_PBX_NAME}
+      - SSH_PORT=${MIKO_SSH_PORT}
+      - WEB_PORT=${MIKO_WEB_PORT}
+      - WEB_HTTPS_PORT=${MIKO_WEB_HTTPS_PORT}
+
+volumes:
+  mikopbx-cf:
+    name: mikopbx-cf
+  mikopbx-storage:
+    name: mikopbx-storage
