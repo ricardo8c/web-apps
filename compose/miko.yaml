@@ -24,5 +24,7 @@ services:
 volumes:
   mikopbx-cf:
     name: mikopbx-cf
+    external: true
   mikopbx-storage:
     name: mikopbx-storage
+    external: true
