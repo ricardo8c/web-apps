@@ -1,3 +1,7 @@
+# 5060 (UDP): Porta padrão para conexões de clientes SIP (telefones e ramais).
+# 5061 (UDP): Usada para conexões SIP criptografadas (TLS).
+# 10000 até 10800 (UDP): Intervalo de portas RTP, que servem para transmitir a voz das ligações.
+
 services:
   mikopbx:
     container_name: "mikopbx"

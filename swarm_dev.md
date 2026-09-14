@@ -74,7 +74,7 @@ docker swarm join-token worker
 
 ingressar no swarn por outros nodes
 ```
-docker swarm join --token 09l35cbikjpi99vubvph5n1hv 192.168.15.199:2377
+docker swarm join --token $SWARM?_TOKEN 192.168.15.199:2377
 ```
 
 cria a rede
