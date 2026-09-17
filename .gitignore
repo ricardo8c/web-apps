@@ -1,5 +1,6 @@
 .cache/
 alias/
+teste_volumes/
 # Ignorar arquivos de ambiente com senhas e chaves secretas
 *.env
 .env.local
