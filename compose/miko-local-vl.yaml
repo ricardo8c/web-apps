@@ -1,0 +1,30 @@
+# 5060 (UDP): Porta padrão para conexões de clientes SIP (telefones e ramais).
+# 5061 (UDP): Usada para conexões SIP criptografadas (TLS).
+# 10000 até 10800 (UDP): Intervalo de portas RTP, que servem para transmitir a voz das ligações.
+
+services:
+  mikopbx:
+    container_name: "mikopbx"
+    image: "mikopbx/mikopbx"
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+    entrypoint: "/sbin/docker-entrypoint"
+    hostname:  "mikopbx"
+    volumes:
+      - ${APPS_DIR}/mikopbx/cf:/cf
+      - ${APPS_DIR}/mikopbx/storage:/storage
+    tty: true
+    environment:
+      - PBX_NAME=${MIKO_PBX_NAME}
+      - SSH_PORT=${MIKO_SSH_PORT}
+      - WEB_PORT=${MIKO_WEB_PORT}
+      - WEB_HTTPS_PORT=${MIKO_WEB_HTTPS_PORT}
+
+volumes:
+  mikopbx-cf:
+    name: mikopbx-cf
+    external: true
+  mikopbx-storage:
+    name: mikopbx-storage
+    external: true
