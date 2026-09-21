@@ -2,6 +2,7 @@ services:
   traefik:
     image: traefik:v3
     container_name: traefik
+    restart: unless-stopped
     ports:
       # listen on host ports without ingress network
       - target: 80
@@ -89,6 +90,7 @@ services:
   tinyauth:
     image: ghcr.io/steveiliop56/tinyauth:v5
     container_name: tinyauth
+    restart: unless-stopped
     networks:
       - ${PROXY_NETWORK}
     volumes:
