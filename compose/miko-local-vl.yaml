@@ -21,6 +21,8 @@ services:
       - SSH_PORT=${MIKO_SSH_PORT}
       - WEB_PORT=${MIKO_WEB_PORT}
       - WEB_HTTPS_PORT=${MIKO_WEB_HTTPS_PORT}
+      - SIP_PORT=${MIKO_SIP_PORT:-5060}
+      - TLS_PORT=${MIKO_TLS_PORT:-5061}
 
 volumes:
   mikopbx-cf:
