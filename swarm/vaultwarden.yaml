@@ -1,0 +1,37 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:${VAULTWARDEN_IMAGETAG}
+    hostname: vaultwarden
+    networks:
+      - proxy2
+    environment:
+      DOMAIN: "https://${VAULTWARDEN_DOMAIN}"  # required when using a reverse proxy
+      SIGNUPS_ALLOWED: "true" # Deactivate this with "false" after you have created your account
+      SMTP_HOST: ${DEV_SMTP_HOST}
+      SMTP_FROM: ${DEV_SMTP_FROM}
+      SMTP_PORT: ${DEV_SMTP_PORT}
+      SMTP_SECURITY: off
+      #SMTP_USERNAME:
+      #SMTP_PASSWORD:
+    volumes:
+      - vaultwarden:/data 
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.vaultwarden.rule=Host(`${VAULTWARDEN_DOMAIN}`)
+        - traefik.http.services.vaultwarden.loadbalancer.server.port=80
+        - traefik.http.routers.vaultwarden.tls.certresolver=http
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2
+
+volumes:
+  vaultwarden:
+    name: vaultwarden
