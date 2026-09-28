@@ -14,7 +14,7 @@ services:
         protocol: tcp
         mode: host
     networks:
-      - ${PROXY_NETWORK}
+      - traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${APPS_DIR}/traefik:/traefik
@@ -114,7 +114,7 @@ volumes:
     name: tinyauth
 
 networks:
-  traefik_proxy:
+  traefik:
     external: true
     attachable: true
     name: ${PROXY_NETWORK}
