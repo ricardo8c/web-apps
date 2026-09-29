@@ -92,7 +92,7 @@ services:
     container_name: tinyauth
     restart: unless-stopped
     networks:
-      - ${PROXY_NETWORK}
+      - traefik
     volumes:
       - tinyauth:/data
     environment:
