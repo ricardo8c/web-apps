@@ -17,7 +17,7 @@ services:
       - traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${APPS_DIR}/traefik:/traefik
+      - ${APPS_DIR}/traefik${ENVID}:/traefik
       #- /var/log:/var/log
     command:
       - --api.dashboard=true
