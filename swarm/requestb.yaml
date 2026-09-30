@@ -1,6 +1,6 @@
 services:
   requestb:
-    image: darklynx/request-baskets
+    image: elemtart/request-baskets:latest
     hostname: requestb
     volumes:
       - requestb:/var/lib/rbaskets #baskets.db
