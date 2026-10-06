@@ -32,7 +32,7 @@ services:
       REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers: '[Docker-Content-Digest]'
       REGISTRY_STORAGE_DELETE_ENABLED: 'true'
     volumes:
-      - ./registry/data:/var/lib/registry
+      - ${APPS_DIR}/registry/data:/var/lib/registry
     container_name: registry-server
     networks:
       - proxy
