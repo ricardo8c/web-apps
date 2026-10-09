@@ -6,6 +6,7 @@ services:
       - bifrost_data:/app/data
     environment:
       - TZ=America/Sao_Paulo
+      - BIFROST_SETUP_TOKEN=${BIFROST_SETUP_TOKEN}
     networks:
       - proxy2
     deploy:
