@@ -1,0 +1,32 @@
+services:
+  litellm:
+    image: docker.litellm.ai/berriai/litellm:main-stable
+    hostname: litellm
+    networks:
+      - proxy2
+    environment:
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+      - LITELLM_SALT_KEY=${LITELLM_SALT_KEY}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/litellm
+      - STORE_MODEL_IN_DB=True # allows adding models to proxy via UI.
+      #- UI_USERNAME=ricardo
+      #- UI_PASSWORD=${LITELLM_UI_PASSWORD}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      #resources:
+      #  limits:
+      #    cpus: "1"
+      #    memory: 1024M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.litellm.rule=Host(`lllm.$DOMAINNAME3`)
+        - traefik.http.services.litellm.loadbalancer.server.port=4000
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2
