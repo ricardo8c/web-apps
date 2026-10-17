@@ -1,0 +1,35 @@
+services:
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:latest
+    hostname: hindsight
+    #ports:
+    #  - "8888:8888"  # API
+    #  - "9999:9999"  # UI / Control Plane
+    environment:
+      # Garante identidade estável do worker entre restarts (recomendado na doc)
+      - HINDSIGHT_API_WORKER_ID=${HINDSIGHT_API_WORKER_ID:-hindsight-prod}
+      # Aponta para o Postgres externo (serviço `db` com pgvector)
+      - HINDSIGHT_API_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/hindsight
+
+    networks:
+      - proxy2
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.hindsight_ui.rule=Host(`hs.$DOMAINNAME3`)
+        - traefik.http.services.hindsight_ui.loadbalancer.server.port=9999
+        - traefik.http.routers.hindsight_ui.service=hindsight_ui
+        - traefik.http.routers.hindsight_ui.middlewares=tinyauth
+        - traefik.http.routers.hindsight_api.rule=Host(`hsapi.$DOMAINNAME3`)
+        - traefik.http.services.hindsight_api.loadbalancer.server.port=8888
+        - traefik.http.routers.hindsight_api.service=hindsight_api
+
+networks:
+  proxy2:
+    external: true
+    attachable: true
+    name: proxy2
