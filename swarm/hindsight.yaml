@@ -10,6 +10,26 @@ services:
       - HINDSIGHT_API_WORKER_ID=${HINDSIGHT_API_WORKER_ID:-hindsight-prod}
       # Aponta para o Postgres externo (serviço `db` com pgvector)
       - HINDSIGHT_API_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/hindsight
+      # `docker stack deploy` só injeta no container as variáveis listadas
+      # aqui; apenas tê-las no env file não basta.
+      - HINDSIGHT_API_LLM_PROVIDER=${HINDSIGHT_API_LLM_PROVIDER}
+      - HINDSIGHT_API_LLM_API_KEY=${HINDSIGHT_API_LLM_API_KEY}
+      - HINDSIGHT_API_LLM_BASE_URL=${HINDSIGHT_API_LLM_BASE_URL}
+      - HINDSIGHT_API_LLM_MODEL=${HINDSIGHT_API_LLM_MODEL}
+      - HINDSIGHT_API_RETAIN_MAX_COMPLETION_TOKENS=${HINDSIGHT_API_RETAIN_MAX_COMPLETION_TOKENS}
+      - HINDSIGHT_API_LLM_DEBUG_DUMP_4XX=${HINDSIGHT_API_LLM_DEBUG_DUMP_4XX}
+      - HINDSIGHT_API_TENANT_EXTENSION=${HINDSIGHT_API_TENANT_EXTENSION}
+      - HINDSIGHT_API_TENANT_API_KEY=${HINDSIGHT_API_TENANT_API_KEY}
+      - HINDSIGHT_CP_DATAPLANE_API_KEY=${HINDSIGHT_CP_DATAPLANE_API_KEY}
+      - HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL=${HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL}
+      # O modelo local nao default (bge-m3) e baixado do HuggingFace no primeiro
+      # boot (~2.3GB). Sem volume, cada restart baixa de novo e estoura o timeout
+      # default de 300s, derrubando o servico em loop.
+      - HINDSIGHT_API_MODEL_INIT_TIMEOUT=${HINDSIGHT_API_MODEL_INIT_TIMEOUT:-1800}
+
+    volumes:
+      # Persiste o cache de modelos (bge-m3, reranker, etc) entre restarts.
+      - hindsight_hf_cache:/home/hindsight/.cache/huggingface
 
     networks:
       - proxy2
@@ -20,6 +40,9 @@ services:
         constraints: [node.role == manager]
       labels:
         - traefik.enable=true
+        # Este servico so esta na proxy2; sem isto o Traefik tenta a rede
+        # default do provider (`proxy`) e cai no fallback com warnings.
+        - traefik.swarm.network=proxy2
         - traefik.http.routers.hindsight_ui.rule=Host(`hs.$DOMAINNAME3`)
         - traefik.http.services.hindsight_ui.loadbalancer.server.port=9999
         - traefik.http.routers.hindsight_ui.service=hindsight_ui
@@ -33,3 +56,7 @@ networks:
     external: true
     attachable: true
     name: proxy2
+
+volumes:
+  hindsight_hf_cache:
+    name: hindsight_hf_cache
