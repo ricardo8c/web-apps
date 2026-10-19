@@ -43,7 +43,7 @@ services:
         # Este servico so esta na proxy2; sem isto o Traefik tenta a rede
         # default do provider (`proxy`) e cai no fallback com warnings.
         - traefik.swarm.network=proxy2
-        - traefik.http.routers.hindsight_ui.rule=Host(`hs.$DOMAINNAME3`)
+        - traefik.http.routers.hindsight_ui.rule=Host(`hs.$DOMAINNAME2`)
         - traefik.http.services.hindsight_ui.loadbalancer.server.port=9999
         - traefik.http.routers.hindsight_ui.service=hindsight_ui
         - traefik.http.routers.hindsight_ui.middlewares=tinyauth
