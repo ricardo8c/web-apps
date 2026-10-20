@@ -5,14 +5,9 @@ services:
     volumes:
       - dbx-data:/app/data
     labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=${TRAEFIK_NETWORK:-traefik-proxy}"
-      - "traefik.http.routers.dbx.rule=Host(`dbx.$DOMAINNAME1`)"
-      - "traefik.http.routers.dbx.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.dbx.tls=true"
-      - "traefik.http.routers.dbx.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}"
-      - "traefik.http.routers.dbx.priority=1"
-      - "traefik.http.services.dbx.loadbalancer.server.port=4224"
+      - traefik.enable=true
+      - traefik.http.routers.dbx.rule=Host(`dbx.$DOMAINNAME1`)
+      - traefik.http.services.dbx.loadbalancer.server.port=4224
     networks:
       - traefik
 
@@ -23,4 +18,5 @@ volumes:
 networks:
   traefik:
     external: true
-    name: ${TRAEFIK_NETWORK:-traefik-proxy}
+    attachable: true
+    name: ${PROXY_NETWORK}
