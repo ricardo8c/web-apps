@@ -13,9 +13,9 @@ services:
         constraints: [node.role == manager]
       labels:
         - traefik.enable=true
-        - traefik.http.routers.9router.rule=Host(`dbx.$DOMAINNAME2`)
-        - traefik.http.services.9router.loadbalancer.server.port=4224
-        - traefik.http.routers.9router.middlewares=tinyauth
+        - traefik.http.routers.dbx.rule=Host(`dbx.$DOMAINNAME2`)
+        - traefik.http.services.dbx.loadbalancer.server.port=4224
+        - traefik.http.routers.dbx.middlewares=tinyauth
 
 networks:
   proxy2:
