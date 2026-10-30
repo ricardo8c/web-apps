@@ -1,0 +1,17 @@
+services:
+    iSponsorBlockTV:
+        image: ghcr.io/dmunozv04/isponsorblocktv
+        container_name: iSponsorBlockTV
+        restart: unless-stopped
+        network_mode: host
+        volumes:
+        - ${APPS_DIR}/isponsorblocktv:/app/data #enter the same pathway as you used for your configurator in step 1
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    attachable: true
+    name: ${PROXY_NETWORK}
