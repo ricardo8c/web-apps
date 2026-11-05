@@ -1,0 +1,29 @@
+services:
+  databasement:
+    image: davidcrty/databasement:1
+    restart: unless-stopped
+    volumes:
+      - databasement:/data
+    environment:
+      - ENABLE_QUEUE_WORKER=true
+      - DB_DATABASE=/data/database.sqlite
+      - DB_CONNECTION=sqlite
+    ports:
+      - '2226:2226'
+    container_name: databasement
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dbx.rule=Host(`dbkp.$DOMAINNAME1`)
+      - traefik.http.services.dbx.loadbalancer.server.port=2226
+    networks:
+      - traefik
+
+volumes:
+  databasement:
+    name: databasement
+
+networks:
+  traefik:
+    external: true
+    attachable: true
+    name: ${PROXY_NETWORK}
